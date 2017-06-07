@@ -1,6 +1,8 @@
 # dingtalk-open
 钉钉开放平台 GO SDK
 
+[![Build Status](https://travis-ci.org/infoepoch/dingtalk-open.svg?branch=master)](https://travis-ci.org/infoepoch/dingtalk-open)
+
 ## 封装功能列表
 
 ### 自定义机器人
