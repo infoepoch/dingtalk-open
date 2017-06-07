@@ -7,6 +7,12 @@ import (
 	"strconv"
 )
 
+
+//// 测试发送文本内容结构体是否正常
+//func TestTextStruct(t *testing.T) {
+//
+//}
+
 // 测试封装接口
 func TestSendText(t *testing.T) {
 	i := time.Now().Unix()
