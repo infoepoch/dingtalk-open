@@ -413,7 +413,7 @@ func (b *BeegoHTTPRequest) DoRequest() (resp *http.Response, err error) {
 			}
 		}
 		paramBody = buf.String()
-		paramBody = paramBody[0 : len(paramBody)-1]
+		paramBody = paramBody[0: len(paramBody)-1]
 	}
 
 	b.buildURL(paramBody)
