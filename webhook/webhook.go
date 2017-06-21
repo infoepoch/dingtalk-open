@@ -5,9 +5,10 @@ import (
 	"log"
 )
 
-var AccessToken = ""
-
 /*
+官方参考文档：
+https://open-doc.dingtalk.com/docs/doc.htm?spm=a219a.7629140.0.0.8JWX03&treeId=257&articleId=105735&docType=1
+
 发送文字
 {
     "msgtype": "text",
@@ -34,20 +35,7 @@ link 类型
         "messageUrl": "https://mp.weixin.qq.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI"
     }
 }
-整体跳转ActionCard类型
-{
-    "actionCard": {
-        "title": "乔布斯 20 年前想打造一间苹果咖啡厅，而它正是 Apple Store 的前身",
-        "text": "![screenshot](@lADOpwk3K80C0M0FoA)
- ### 乔布斯 20 年前想打造的苹果咖啡厅
- Apple Store 的设计正从原来满满的科技感走向生活化，而其生活化的走向其实可以追溯到 20 年前苹果一个建立咖啡馆的计划",
-        "hideAvatar": "0",
-        "btnOrientation": "0",
-        "singleTitle" : "阅读全文",
-        "singleURL" : "https://www.dingtalk.com/"
-    },
-    "msgtype": "actionCard"
-}
+
  */
 
 const API string = "https://oapi.dingtalk.com/robot/send?access_token="
@@ -70,6 +58,11 @@ type At struct {
 	IsAtAll   bool `json:"isAtAll"`
 }
 
+type Btns struct {
+	Title     string `json:"title"`
+	ActionURL string `json:"actionURL"`
+}
+
 // link类型
 type MsgLink struct {
 	MsgType string `json:"msgtype"`
@@ -79,7 +72,7 @@ type MsgLink struct {
 // link 类型详细
 type Link struct {
 	Text       string `json:"text"`
-	Tile       string `json:"title"`
+	Title      string `json:"title"`
 	PicUrl     string `json:"picUrl"`
 	MessageUrl string `json:"messageUrl"`
 }
@@ -90,6 +83,7 @@ type MsgActionCard struct {
 	ActionCard ActionCard `json:"actionCard"`
 }
 
+// 整体跳转ActionCard类型
 type ActionCard struct {
 	Text           string `json:"text"`
 	Tile           string `json:"title"`
@@ -99,14 +93,38 @@ type ActionCard struct {
 	SingleURL      string `json:"singleURL"`
 }
 
+type MsgActionCardBtns struct {
+	MsgType    string `json:"msgtype"`
+	ActionCard ActionCardBtns `json:"actionCard"`
+}
+
+// 独立跳转ActionCard类型
+type ActionCardBtns struct {
+	Text           string `json:"text"`
+	Tile           string `json:"title"`
+	HideAvatar     string `json:"hideAvatar"`
+	BtnOrientation string `json:"btnOrientation"`
+	Btns           []Btns `json:"btns"`
+}
+
+// FeedCard类型
+type MsgFeedCard struct {
+	MsgType      string `json:"msgtype"`
+	FeedCardLink FeedCardLink `json:"feedCard"`
+}
+
+type FeedCardLink struct {
+	Links []Link `json:"links"`
+}
+
 // 发送文本内容
-func SendText(content string) (string, error) {
+func SendText(accessToken string, content string) (string, error) {
 
 	var msgText MsgText
 	msgText.MsgType = "text"
 	msgText.Text.Content = content
 
-	req, err := httplib.Post(API + AccessToken).JSONBody(msgText)
+	req, err := httplib.Post(API + accessToken).JSONBody(msgText)
 	log.Println(msgText)
 	if err != nil {
 		log.Fatal(err)
@@ -117,14 +135,14 @@ func SendText(content string) (string, error) {
 }
 
 // 发送链接地址
-func SendLink(text string, title string, picUrl string, messageUrl string) (string, error) {
+func SendLink(accessToken string, text string, title string, picUrl string, messageUrl string) (string, error) {
 	var msgLink MsgLink
 	msgLink.MsgType = "link"
 	msgLink.Link.Text = text
-	msgLink.Link.Tile = title
+	msgLink.Link.Title = title
 	msgLink.Link.PicUrl = picUrl
 	msgLink.Link.MessageUrl = messageUrl
-	req, err := httplib.Post(API + AccessToken).JSONBody(msgLink)
+	req, err := httplib.Post(API + accessToken).JSONBody(msgLink)
 	log.Println(msgLink)
 	if err != nil {
 		log.Fatal(err)
@@ -136,17 +154,92 @@ func SendLink(text string, title string, picUrl string, messageUrl string) (stri
 }
 
 // 发送链接地址
-func SendActionCard(text string, title string, hideAvatar string, btnOrientation string, singleTitle string, singleURL string) (string, error) {
-	var msgLink MsgActionCard
-	msgLink.MsgType = "actionCard"
-	msgLink.ActionCard.Text = text
-	msgLink.ActionCard.Tile = title
-	msgLink.ActionCard.HideAvatar = hideAvatar
-	msgLink.ActionCard.BtnOrientation = btnOrientation
-	msgLink.ActionCard.SingleTitle = singleTitle
-	msgLink.ActionCard.SingleURL = singleURL
+/*
+整体跳转ActionCard类型
+{
+    "actionCard": {
+        "title": "乔布斯 20 年前想打造一间苹果咖啡厅，而它正是 Apple Store 的前身",
+        "text": "![screenshot](@lADOpwk3K80C0M0FoA)
+ ### 乔布斯 20 年前想打造的苹果咖啡厅
+ Apple Store 的设计正从原来满满的科技感走向生活化，而其生活化的走向其实可以追溯到 20 年前苹果一个建立咖啡馆的计划",
+        "hideAvatar": "0",
+        "btnOrientation": "0",
+        "singleTitle" : "阅读全文",
+        "singleURL" : "https://www.dingtalk.com/"
+    },
+    "msgtype": "actionCard"
+}
+*/
+func SendActionCard(accessToken string, text string, title string, hideAvatar string, btnOrientation string, singleTitle string, singleURL string) (string, error) {
+	var msg MsgActionCard
+	msg.MsgType = "actionCard"
+	msg.ActionCard.Text = text
+	msg.ActionCard.Tile = title
+	msg.ActionCard.HideAvatar = hideAvatar
+	msg.ActionCard.BtnOrientation = btnOrientation
+	msg.ActionCard.SingleTitle = singleTitle
+	msg.ActionCard.SingleURL = singleURL
 
-	req, err := httplib.Post(API + AccessToken).JSONBody(msgLink)
+	req, err := httplib.Post(API + accessToken).JSONBody(msg)
+	log.Println(msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	str, err1 := req.String()
+	log.Println(str)
+	return str, err1
+}
+
+/**
+独立跳转ActionCard类型
+{
+    "actionCard": {
+        "title": "乔布斯 20 年前想打造一间苹果咖啡厅，而它正是 Apple Store 的前身",
+        "text": "![screenshot](@lADOpwk3K80C0M0FoA)
+ ### 乔布斯 20 年前想打造的苹果咖啡厅
+ Apple Store 的设计正从原来满满的科技感走向生活化，而其生活化的走向其实可以追溯到 20 年前苹果一个建立咖啡馆的计划",
+        "hideAvatar": "0",
+        "btnOrientation": "0",
+        "btns": [
+            {
+                "title": "内容不错",
+                "actionURL": "https://www.dingtalk.com/"
+            },
+            {
+                "title": "不感兴趣",
+                "actionURL": "https://www.dingtalk.com/"
+            }
+        ]
+    },
+    "msgtype": "actionCard"
+}
+ */
+func SendActionCardBtns(accessToken string, text string, title string, hideAvatar string, btnOrientation string, btns []Btns) (string, error) {
+	var msg MsgActionCardBtns
+	msg.MsgType = "actionCard"
+	msg.ActionCard.Text = text
+	msg.ActionCard.Tile = title
+	msg.ActionCard.HideAvatar = hideAvatar
+	msg.ActionCard.BtnOrientation = btnOrientation
+	msg.ActionCard.Btns = btns;
+	req, err := httplib.Post(API + accessToken).JSONBody(msg)
+	log.Println(msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	str, err1 := req.String()
+	log.Println(str)
+	return str, err1
+}
+
+// FeedCard类型
+func SendFeedCard(accessToken string, links []Link) (string, error) {
+	var msgLink MsgFeedCard
+	msgLink.MsgType = "feedCard"
+	msgLink.FeedCardLink.Links = links
+	req, err := httplib.Post(API + accessToken).JSONBody(msgLink)
 	log.Println(msgLink)
 	if err != nil {
 		log.Fatal(err)
