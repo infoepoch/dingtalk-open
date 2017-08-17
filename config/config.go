@@ -9,8 +9,6 @@ import (
 const BaseUrl string = "https://oapi.dingtalk.com/"
 
 var version = "1.0.0"
-var CORP_ID string
-var SSO_SECRECT string
 
 const (
 	ctypeAppName = ""
