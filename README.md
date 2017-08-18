@@ -4,7 +4,38 @@
 [![Build Status](https://travis-ci.org/infoepoch/dingtalk-open.svg?branch=master)](https://travis-ci.org/infoepoch/dingtalk-open)
 [![Go Report Card](https://goreportcard.com/badge/github.com/infoepoch/dingtalk-open)](https://goreportcard.com/report/github.com/infoepoch/dingtalk-open)
 
-## 封装功能列表
+## 安装:
+```
+go get github.com/infoepoch/dingtalk-open
+```
 
-### 自定义机器人
-参考地址：[自定义机器人](https://open-doc.dingtalk.com/docs/doc.htm?spm=a219a.7629140.0.0.karFPe&treeId=257&articleId=105735&docType=1)
+## 更新:
+```
+go get -u github.com/infoepoch/dingtalk-open  
+```
+
+## 快速使用案例
+
+发送到群机器人信息
+
+```Go
+package main
+
+import (
+	"fmt"
+	"github.com/infoepoch/dingtalk-open/webhook"
+	"log"
+)
+
+// 钉钉机器人 token
+const dingTalkBotAccessToken = ""
+
+// 发送钉钉纯文本内容
+func SendDingTalkText(text string) {
+	str, err := webhook.SendText(dingTalkBotAccessToken, text)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(str)
+}
+```
