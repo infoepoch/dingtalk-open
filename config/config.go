@@ -8,6 +8,9 @@ import (
 // 钉钉开发平台地址
 const BaseUrl string = "https://oapi.dingtalk.com/"
 
+// 钉钉
+const EcoUrl string = "https://eco.taobao.com/router/rest"
+
 var version = "1.0.0"
 
 const (
